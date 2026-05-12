@@ -18,3 +18,12 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+# VEHICLE MODEL
+
+# PARKING SLOT MODEL
+
+
+# TYRE SERVICE MODEL
+
+# BATTERY SERVICE MODEL
