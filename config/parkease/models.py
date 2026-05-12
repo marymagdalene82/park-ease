@@ -19,9 +19,6 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
     
-
-
-
 class Vehicle_registration(models.Model):
     driver_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15)
@@ -37,3 +34,13 @@ class Vehicle_registration(models.Model):
     
     def __str__(self):
         return self.name
+
+# VEHICLE MODEL
+
+# PARKING SLOT MODEL
+
+
+# TYRE SERVICE MODEL
+
+# BATTERY SERVICE MODEL
+>>>>>>> b4d504e4e79296181116295d95299e740c98a39c
