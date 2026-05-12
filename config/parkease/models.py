@@ -42,5 +42,23 @@ class Vehicle_registration(models.Model):
 
 # TYRE SERVICE MODEL
 
+class Service(models.Model):
+    SERVICE_TYPE_CHOICES = [
+        ('Pressure', 'Puncture Repair'),
+        ('Valve', 'Valve Replacement'),
+    ]
+ # Ai developed the top part I'm not quite sure
+
+    service_date = models.DateField(auto_now_add=True)
+    service_type = models.CharField(max_length=20, choices=SERVICE_TYPE_CHOICES)
+    vehicle = models.ForeignKey(Vehicle_registration, on_delete=models.CASCADE, related_name="services")
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    recorded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="services_recorded")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.service_type} for {self.vehicle}"
+ #This too
+
 # BATTERY SERVICE MODEL
->>>>>>> b4d504e4e79296181116295d95299e740c98a39c
+
