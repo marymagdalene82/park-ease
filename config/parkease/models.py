@@ -47,7 +47,6 @@ class Service(models.Model):
         ('Pressure', 'Puncture Repair'),
         ('Valve', 'Valve Replacement'),
     ]
- # Ai developed the top part I'm not quite sure
 
     service_date = models.DateField(auto_now_add=True)
     service_type = models.CharField(max_length=20, choices=SERVICE_TYPE_CHOICES)
@@ -58,7 +57,7 @@ class Service(models.Model):
 
     def __str__(self):
         return f"{self.service_type} for {self.vehicle}"
- #This too
+
 
 # BATTERY SERVICE MODEL
 
