@@ -43,7 +43,9 @@ class Vehicle(models.Model):
     )
     color = models.CharField(max_length=50)
     nin = models.CharField(max_length=20, blank=True, null=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="vehicles")
+    created_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="vehicles"
+    )
 
     def __str__(self):
         return self.name
@@ -51,7 +53,9 @@ class Vehicle(models.Model):
 
 # PARKING SESSION MODEL
 class ParkingSession(models.Model):
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name="parking_sessions")
+    vehicle = models.ForeignKey(
+        Vehicle, on_delete=models.CASCADE, related_name="parking_sessions"
+    )
     receipt_number = models.CharField(max_length=20, unique=True, editable=False)
     arrival_time = models.DateTimeField(default=timezone.now)
     departure_time = models.DateTimeField(blank=True, null=True)
@@ -60,24 +64,35 @@ class ParkingSession(models.Model):
     receiver_nin = models.CharField(max_length=20, blank=True, null=True)
     parking_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     is_signed_out = models.BooleanField(default=False)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="created_sessions")
-    signed_out_by = models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True,related_name="signed_out_sessions",)
+    created_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, related_name="created_sessions"
+    )
+    signed_out_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="signed_out_sessions",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
 
 # TYRE SERVICE MODEL
 class TyreService(models.Model):
     SERVICE_TYPE_CHOICES = [
-        ('pressure', 'Pressure'),
-        ('puncture', 'Puncture Fixing'),
-        ('valve', 'Valve'),
-
+        ("pressure", "Pressure"),
+        ("puncture", "Puncture Fixing"),
+        ("valve", "Valve"),
     ]
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name="services")
+    vehicle = models.ForeignKey(
+        Vehicle, on_delete=models.CASCADE, related_name="services"
+    )
     service_date = models.DateField(auto_now_add=True)
-    service_type = models.CharField(max_length=20, choices=SERVICE_TYPE_CHOICES) 
+    service_type = models.CharField(max_length=20, choices=SERVICE_TYPE_CHOICES)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    recorded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="services_recorded")
+    recorded_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="services_recorded"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -85,3 +100,32 @@ class TyreService(models.Model):
 
 
 # BATTERY SERVICE MODEL
+class BatteryTransaction(models.Model):
+
+    TRANSACTION_TYPES = [
+        ("hire", "Hire"),
+        ("sale", "Sale"),
+    ]
+
+    BATTERY_PRICES = {
+        "hire": 10000,
+        "sale": 250000,
+    }
+    vehicle = models.ForeignKey(
+        Vehicle, on_delete=models.SET_NULL, null=True, blank=True
+    )
+
+    customer_name = models.CharField(max_length=100)
+
+    phone_number = models.CharField(max_length=10)
+
+    transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
+    battery_type = models.CharField(max_length=100)
+
+    price = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
+
+    transaction_date = models.DateTimeField(default=timezone.now)
+
+    recorded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
