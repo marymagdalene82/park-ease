@@ -1,15 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
+
 
 # Create your models here.
 # User Model
 class User(AbstractUser):
 
     ROLE_CHOICES = [
-        ('attendant', 'Parking Attendant'),
-        ('tyre_manager', 'Tyre Manager'),
-        ('battery_manager', 'Battery Manager'),
-        ('admin', 'System Admin'),
+        ("attendant", "Parking Attendant"),
+        ("tyre_manager", "Tyre Manager"),
+        ("battery_manager", "Battery Manager"),
+        ("admin", "System Admin"),
     ]
 
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
@@ -18,39 +20,62 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-    
-class Vehicle_registration(models.Model):
+
+
+# VEHICLE MODEL
+class Vehicle(models.Model):
+
+    VEHICLE_TYPES = [
+        ("truck", "Truck"),
+        ("car", "Personal Car"),
+        ("taxi", "Taxi"),
+        ("coaster", "Coaster"),
+        ("boda", "Boda-boda"),
+    ]
+
     driver_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15)
-    Vehicle_type = models.CharField(max_length=100)
+    vehicle_type = models.CharField(max_length=20, choices=VEHICLE_TYPES)
     model = models.CharField(max_length=100)
+    number_plate = models.CharField(
+        max_length=10,
+        unique=True,
+    )
     color = models.CharField(max_length=50)
-    nin = models.CharField(max_length=20, blank=True, null=True)  
-    arrival_time = models.TimeField()
-    arrival_date = models.DateField()
-    receipt_number = models.CharField(max_length=50, unique=True)  
-    is_signed_out = models.BooleanField(default=False)
+    nin = models.CharField(max_length=20, blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="vehicles")
-    
+
     def __str__(self):
         return self.name
 
-# VEHICLE MODEL
 
-# PARKING SLOT MODEL
+# PARKING SESSION MODEL
+class ParkingSession(models.Model):
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name="parking_sessions")
+    receipt_number = models.CharField(max_length=20, unique=True, editable=False)
+    arrival_time = models.DateTimeField(default=timezone.now)
+    departure_time = models.DateTimeField(blank=True, null=True)
+    receiver_name = models.CharField(max_length=100, blank=True, null=True)
+    receiver_phone = models.CharField(max_length=10, blank=True, null=True)
+    receiver_nin = models.CharField(max_length=20, blank=True, null=True)
+    parking_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    is_signed_out = models.BooleanField(default=False)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="created_sessions")
+    signed_out_by = models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True,related_name="signed_out_sessions",)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 # TYRE SERVICE MODEL
-
-class Service(models.Model):
+class TyreService(models.Model):
     SERVICE_TYPE_CHOICES = [
-        ('Pressure', 'Puncture Repair'),
-        ('Valve', 'Valve Replacement'),
-    ]
+        ('pressure', 'Pressure'),
+        ('puncture', 'Puncture Fixing'),
+        ('valve', 'Valve'),
 
+    ]
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name="services")
     service_date = models.DateField(auto_now_add=True)
-    service_type = models.CharField(max_length=20, choices=SERVICE_TYPE_CHOICES)
-    vehicle = models.ForeignKey(Vehicle_registration, on_delete=models.CASCADE, related_name="services")
+    service_type = models.CharField(max_length=20, choices=SERVICE_TYPE_CHOICES) 
     price = models.DecimalField(max_digits=10, decimal_places=2)
     recorded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="services_recorded")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -60,4 +85,3 @@ class Service(models.Model):
 
 
 # BATTERY SERVICE MODEL
-
